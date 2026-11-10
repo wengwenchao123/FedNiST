@@ -1,7 +1,5 @@
-numpy<2
+torch>=2.0
+numpy
 pandas
-pymetis
 scipy
 tables
-torch
-torchvision

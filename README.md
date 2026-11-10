@@ -1,49 +1,81 @@
 # FedNiST
 
-This directory contains the complete code, configuration, example dataset, and
-existing pretrained weights required by `run.py`.
+## Table of Contents
 
-## Dataset Notice
+- `config_file`: training and model configurations for each dataset.
+- `lib`: utilities for data loading, preprocessing, normalization, and evaluation metrics.
+- `model`: implementation of FedNiST.
+- `data`: directory for the datasets.
+- `train.py`: command-line entry point.
+- `model/BasicTrainer.py`: federated training, validation, checkpointing, and final evaluation.
 
-Due to the AAAI upload file-size limit, only the PEMS08 dataset is included as
-an example. Please download the other datasets from their public sources and
-place them in the `data` directory before running the corresponding experiments.
+## Requirements
 
-## Environment
+Python 3.9 or later, PyTorch 2.0 or later, NumPy, pandas, SciPy, and PyTables. `argparse` and `configparser` are included in the Python standard library.
 
-Python 3.9 or later is recommended. Install PyTorch for the CUDA version used by
-the machine first, then install the remaining dependencies:
+Install a PyTorch build compatible with your CUDA environment, then install the dependencies:
 
-```powershell
+```bash
 pip install -r requirements.txt
 ```
 
-`pymetis` is required only when using `--client_partition_method metis_dtw`.
+## Data Preparation
 
-## Run
+Place the dataset files in the `data` directory using the following structure:
 
-Run commands from this directory because configuration, data, cache, and
-pretrained model paths are relative to the working directory.
-
-```powershell
-cd FedNiST
-python run.py --dataset PEMSD4 --mode train --device cuda:0
+```text
+data/
+  METR-LA/METR-LA.h5
+  PEMS-BAY/pems-bay.h5
+  PeMS03/PEMS03.npz
+  PeMS04/PEMS04.npz
+  PeMS07/PEMS07.npz
+  PeMS08/PEMS08.npz
+  PEMS07(M)/V_228.csv
+  PEMS07(L)/PEMS07L.npz
 ```
 
-Use ratio-based random node partitioning:
+Dataset files are not included in this repository. Directory and file names are case-sensitive on Linux.
 
-```powershell
-python run.py --dataset PEMSD4 --num_clients 4 --client_node_ratio 0.4,0.3,0.2,0.1
+## Model Training
+
+Run the following command from the project root:
+
+```bash
+python train.py --dataset DATASET_NAME --lazy-windows --output outputs/RUN_NAME
 ```
 
-Use DTW and METIS node partitioning:
+Replace `DATASET_NAME` with one of the following identifiers:
 
-```powershell
-python run.py --dataset PEMSD4 --client_partition_method metis_dtw
+| Dataset | Identifier |
+|---|---|
+| METR-LA | METR-LA |
+| PEMS-BAY | PEMS-BAY |
+| PEMS03 | PEMSD3 |
+| PEMS04 | PEMSD4 |
+| PEMS07 | PEMSD7 |
+| PEMS08 | PEMSD8 |
+| PEMS07(M) | PEMSD7(M) |
+| PEMS07(L) | PEMSD7(L) |
+
+For example, train FedNiST on PEMS08:
+
+```bash
+python train.py --dataset PEMSD8 --num-clients 4 --embedding-dim 32 --num-experts 4 --seed 0 --lazy-windows --output outputs/PEMS08-seed0
 ```
 
-Supported configuration names are `PEMSD3`, `PEMSD4`, `PEMSD7`, `PEMSD7(L)`,
-`PEMSD7(M)`, `PEMSD8`, `PEMS-BAY`, and `METR-LA`.
+Quote dataset identifiers containing parentheses:
 
-Training outputs are created under `experiments/<dataset>/<timestamp>` inside
-this directory.
+```bash
+python train.py --dataset "PEMSD7(M)" --lazy-windows --output outputs/PEMS07M-seed0
+```
+
+The corresponding configuration is loaded from `config_file` automatically. To specify another configuration file, use `--config-file`:
+
+```bash
+python train.py --dataset PEMSD8 --config-file config_file/PEMSD8_FedNiST.conf --lazy-windows --output outputs/PEMS08-custom
+```
+
+Training saves the configuration, checkpoint, and evaluation results in the specified output directory. Final test evaluation runs automatically after training. Use a new output directory for each run.
+
+GPU execution uses `cuda:0` by default. Add `--device cpu` to run on CPU. Use `python train.py --help` to view all available options.
