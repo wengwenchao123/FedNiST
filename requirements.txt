@@ -1,0 +1,7 @@
+numpy<2
+pandas
+pymetis
+scipy
+tables
+torch
+torchvision
