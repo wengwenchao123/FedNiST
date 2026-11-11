@@ -19,21 +19,11 @@ Install a PyTorch build compatible with your CUDA environment, then install the 
 pip install -r requirements.txt
 ```
 
-## Data Preparation
+# Data Preparation
 
-Place the dataset files in the `data` directory using the following structure:
+For convenience, we package these datasets used in our model in [Google Drive](https://drive.google.com/file/d/1IQ3DX9GwLr5L-6nHY5AYFT-0z5JIuzdi/view?usp=sharing).
 
-```text
-data/
-  METR-LA/METR-LA.h5
-  PEMS-BAY/pems-bay.h5
-  PeMS03/PEMS03.npz
-  PeMS04/PEMS04.npz
-  PeMS07/PEMS07.npz
-  PeMS08/PEMS08.npz
-  PEMS07(M)/V_228.csv
-  PEMS07(L)/PEMS07L.npz
-```
+Unzip the downloaded dataset files into the `data` folder.
 
 Dataset files are not included in this repository. Directory and file names are case-sensitive on Linux.
 
